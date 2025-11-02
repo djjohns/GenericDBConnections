@@ -1,0 +1,35 @@
+name: Connection Tests (optional)
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  RUN_CONN_TESTS: ${{ secrets.RUN_CONN_TESTS }}
+
+jobs:
+  conn-test:
+    if: env.RUN_CONN_TESTS == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install package & drivers
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install .[postgres] .[mssql] .[teradata] .[dlt] || true
+      - name: Export secrets -> env
+        env:
+          PG_REPORT_PASS: ${{ secrets.PG_REPORT_PASS }}
+          MSSQL_PASS: ${{ secrets.MSSQL_PASS }}
+          TD_HOST: ${{ secrets.TD_HOST }}
+          TD_USER: ${{ secrets.TD_USER }}
+          TD_PASS: ${{ secrets.TD_PASS }}
+        run: |
+          echo "Secrets exported (values hidden)."
+      - name: Run conn-tester
+        run: |
+          conn-tester connections.example.yml || true
