@@ -2,6 +2,7 @@ from __future__ import annotations
 from ..core.BaseConnection import BaseConnection
 from ..core.DictToQuery import dict_to_query
 
+
 class TeradataConnection(BaseConnection):
     TEST_QUERY = "SELECT 1"
 
@@ -11,8 +12,11 @@ class TeradataConnection(BaseConnection):
         password = self.config.password or ""
         host = self.config.host
         database = self.config.schema or ""
-        auth = f"{user}:{password}@" if (user or password) else ""
-        base = f"teradatasql://{auth}{host}/"
+        auth = f"{user}:{password}" if (user or password) else ""
+        logmech = "LDAP"
+        base = (
+            f"teradatasql://{auth}@{host}/?logmech={logmech}&encryptdata=true&database={database}"
+        )
         q = {"database": database} if database else {}
         extra_q = x.get("query")
         if isinstance(extra_q, dict):
