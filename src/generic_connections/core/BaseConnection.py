@@ -6,7 +6,8 @@ from typing import Any, Dict, Iterable, Optional, Type
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine, Connection
 from sqlalchemy.exc import SQLAlchemyError
-from . import ConnectionConfig, PLATFORM_REGISTRY
+from .ConnectionConfig import ConnectionConfig
+from .register_platform import PLATFORM_REGISTRY
 from ..io import load_connections_yaml
 
 

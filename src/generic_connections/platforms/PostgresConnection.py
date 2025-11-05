@@ -1,5 +1,6 @@
 from __future__ import annotations
-from ..core import BaseConnection, dict_to_query
+from ..core.BaseConnection import BaseConnection
+from ..core.dict_to_query import dict_to_query
 
 
 class PostgresConnection(BaseConnection):

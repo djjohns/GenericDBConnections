@@ -1,6 +1,8 @@
-from .core import ConnectionConfig, BaseConnection, PLATFORM_REGISTRY, register_platform
-from .io import load_connections_yaml
-from .platforms import PostgresConnection, MSSQLConnection, TeradataConnection
+# generic_connections/__init__.py
+from .core.ConnectionConfig import ConnectionConfig
+from .core.BaseConnection import BaseConnection
+from .core.register_platform import PLATFORM_REGISTRY, register_platform
+from .io.load_connections_yaml import load_connections_yaml
 
 __all__ = [
     "ConnectionConfig",
@@ -8,7 +10,4 @@ __all__ = [
     "PLATFORM_REGISTRY",
     "register_platform",
     "load_connections_yaml",
-    "PostgresConnection",
-    "MSSQLConnection",
-    "TeradataConnection",
 ]
