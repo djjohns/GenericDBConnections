@@ -4,8 +4,8 @@ import logging
 import sys
 from typing import Iterable, Optional
 
-from ..core import BaseConnection
-from ..io import load_connections_yaml
+from ..core.BaseConnection import BaseConnection
+from ..io.load_connections_yaml import load_connections_yaml
 
 LOG = logging.getLogger("generic_connections.cli")
 if not LOG.handlers:
