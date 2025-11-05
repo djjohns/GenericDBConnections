@@ -182,3 +182,8 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+
+# connections.yml is a configuration file describing our connections.
+connections.yml
+connections.yaml
