@@ -1,4 +1,5 @@
 from __future__ import annotations
+import importlib
 import sys
 import time
 import logging
@@ -97,11 +98,26 @@ class BaseConnection:
 
     @classmethod
     def from_yaml(cls, connection_id: str, yaml_path: str) -> "BaseConnection":
+        from ..io.load_connections_yaml import load_connections_yaml
+        from .ConnectionConfig import ConnectionConfig
+
         data = load_connections_yaml(yaml_path)
         if connection_id not in data:
             raise KeyError(f"connection_id '{connection_id}' not found in {yaml_path}")
+
         cfg = ConnectionConfig.from_dict(connection_id, data[connection_id])
-        kls: Optional[Type[BaseConnection]] = PLATFORM_REGISTRY.get(cfg.platform.lower().strip())
+        key = cfg.platform.lower().strip()
+
+        kls = PLATFORM_REGISTRY.get(key)
+        if not kls:
+            # Lazy-load platform registrations
+            try:
+                importlib.import_module("generic_connections.platforms")
+            except Exception:
+                pass
+            kls = PLATFORM_REGISTRY.get(key)
+
         if not kls:
             raise ValueError(f"Unsupported platform '{cfg.platform}' for {connection_id}")
+
         return kls(cfg)
