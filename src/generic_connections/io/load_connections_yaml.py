@@ -1,7 +1,8 @@
-from __future__ import annotations
-from typing import Any, Dict
 import yaml
-from ..core.ExpandEnv import expand_env
+from typing import Any, Dict
+from __future__ import annotations
+from ..core import expand_env
+
 
 def load_connections_yaml(path: str) -> Dict[str, Any]:
     with open(path, "r", encoding="utf-8") as f:

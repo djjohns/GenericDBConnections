@@ -1,8 +1,7 @@
 from __future__ import annotations
-from ..core.PlatformRegistry import register_platform, PLATFORM_REGISTRY
-from .PostgresConnection import PostgresConnection
-from .MSSQLConnection import MSSQLConnection
-from .TeradataConnection import TeradataConnection
+from ..core.register_platform import register_platform, PLATFORM_REGISTRY
+from . import PostgresConnection, MSSQLConnection, TeradataConnection
+
 
 register_platform("postgres", PostgresConnection)
 register_platform("postgresql", PostgresConnection)

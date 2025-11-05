@@ -4,8 +4,8 @@ import logging
 import sys
 from typing import Iterable, Optional
 
-from ..core.BaseConnection import BaseConnection
-from ..io.LoadConnectionsYaml import load_connections_yaml
+from ..core import BaseConnection
+from ..io import load_connections_yaml
 
 LOG = logging.getLogger("generic_connections.cli")
 if not LOG.handlers:
@@ -13,6 +13,7 @@ if not LOG.handlers:
     h.setFormatter(logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s"))
     LOG.addHandler(h)
 LOG.setLevel(logging.INFO)
+
 
 def test_all(yaml_path: str, only: Optional[Iterable[str]] = None) -> int:
     data = load_connections_yaml(yaml_path)
@@ -33,6 +34,7 @@ def test_all(yaml_path: str, only: Optional[Iterable[str]] = None) -> int:
         return 1
     LOG.info("All tested connections OK")
     return 0
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Test DB connections from YAML")

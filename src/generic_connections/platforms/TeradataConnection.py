@@ -1,6 +1,5 @@
 from __future__ import annotations
-from ..core.BaseConnection import BaseConnection
-from ..core.DictToQuery import dict_to_query
+from ..core import BaseConnection, dict_to_query
 
 
 class TeradataConnection(BaseConnection):

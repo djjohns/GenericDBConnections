@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, Dict
-from ..core.BaseConnection import BaseConnection
-from ..core.DictToQuery import dict_to_query
+from ..core import BaseConnection, dict_to_query
+
 
 class MSSQLConnection(BaseConnection):
     TEST_QUERY = "SELECT 1"
