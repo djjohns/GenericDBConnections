@@ -187,3 +187,6 @@ cython_debug/
 # connections.yml is a configuration file describing our connections.
 connections.yml
 connections.yaml
+
+# No environmental vars file in our repo.
+env_vars.ps1
