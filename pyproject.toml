@@ -19,7 +19,7 @@ dependencies = [
 postgres = ["psycopg2-binary>=2.9; platform_system!='Windows'",
             "psycopg2-binary>=2.9; platform_system=='Windows'"]
 mssql = ["pyodbc>=5.0.0"]
-teradata = ["teradatasql", "teradatasqlalchemy"]
+teradata = ["teradatasql==17.20.0.7", "teradatasqlalchemy==17.0.0.3"]
 dlt = ["dlt>=1.5"]
 dev = ["ruff>=0.6", "black>=24.3", "mypy>=1.10", "pytest>=8.0", "pytest-cov>=5.0"]
 
