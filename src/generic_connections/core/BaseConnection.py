@@ -3,13 +3,14 @@ import importlib
 import sys
 import time
 import logging
-from typing import Any, Dict, Iterable, Optional, Type
+from typing import Any, Dict, Iterable, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine, Connection
 from sqlalchemy.exc import SQLAlchemyError
+from urllib.parse import urlsplit, urlunsplit
+
 from .ConnectionConfig import ConnectionConfig
 from .register_platform import PLATFORM_REGISTRY
-from ..io import load_connections_yaml
 
 
 LOG = logging.getLogger("generic_connections")
@@ -21,6 +22,8 @@ LOG.setLevel(logging.INFO)
 
 
 class BaseConnection:
+    """Base class for all platform-specific SQLAlchemy connections."""
+
     TEST_QUERY: str = "SELECT 1"
 
     def __init__(self, config: ConnectionConfig):
@@ -28,10 +31,34 @@ class BaseConnection:
         self._engine: Optional[Engine] = None
         self._conn: Optional[Connection] = None
 
+    # ------------------------------------------------------------------
+    # Utility: safely mask password in URLs for logging
+    # ------------------------------------------------------------------
+    @staticmethod
+    def _mask_url_password(url: str) -> str:
+        """Return a copy of the URL with any password replaced by *** for safe logging."""
+        try:
+            parts = urlsplit(url)
+            if "@" in parts.netloc and ":" in parts.netloc:
+                userpass, host = parts.netloc.split("@", 1)
+                if ":" in userpass:
+                    user, _ = userpass.split(":", 1)
+                    netloc = f"{user}:***@{host}"
+                    return urlunsplit(
+                        (parts.scheme, netloc, parts.path, parts.query, parts.fragment)
+                    )
+            return url
+        except Exception:
+            return url
+
+    # ------------------------------------------------------------------
+    # Abstracts to override
+    # ------------------------------------------------------------------
     def build_url(self) -> str:  # pragma: no cover
         raise NotImplementedError
 
     def connect_args(self) -> Dict[str, Any]:
+        """Platform-specific connect_args (defaults to none)."""
         return {}
 
     def engine_options(self) -> Dict[str, Any]:
@@ -42,13 +69,19 @@ class BaseConnection:
                 opts.update(eo)
         return opts
 
+    # ------------------------------------------------------------------
+    # Engine + connection management
+    # ------------------------------------------------------------------
     @property
     def engine(self) -> Engine:
         if self._engine is None:
             url = self.build_url()
-            LOG.info("Creating engine for %s: %s", self.config.connection_id, url)
+            safe_url = self._mask_url_password(url)
+            LOG.info("Creating engine for %s: %s", self.config.connection_id, safe_url)
             self._engine = create_engine(
-                url, connect_args=self.connect_args(), **self.engine_options()
+                url,
+                connect_args=self.connect_args(),
+                **self.engine_options(),
             )
         return self._engine
 
@@ -70,6 +103,9 @@ class BaseConnection:
                 self._engine.dispose()
             self._engine = None
 
+    # ------------------------------------------------------------------
+    # Connection testing
+    # ------------------------------------------------------------------
     def test_connection(self, timeout_seconds: int = 15) -> bool:
         start = time.time()
         LOG.info("Testing connection_id=%s", self.config.connection_id)
@@ -96,6 +132,9 @@ class BaseConnection:
             LOG.error("Connection test failed for %s: %s", self.config.connection_id, e)
             return False
 
+    # ------------------------------------------------------------------
+    # Factory
+    # ------------------------------------------------------------------
     @classmethod
     def from_yaml(cls, connection_id: str, yaml_path: str) -> "BaseConnection":
         from ..io.load_connections_yaml import load_connections_yaml
@@ -110,7 +149,7 @@ class BaseConnection:
 
         kls = PLATFORM_REGISTRY.get(key)
         if not kls:
-            # Lazy-load platform registrations
+            # Lazy-load platform registrations if not yet done
             try:
                 importlib.import_module("generic_connections.platforms")
             except Exception:

@@ -1,10 +1,10 @@
-pg_reporting:
-  platform: Postgres
-  host: localhost
+pg:
+  platform: postgres
+  host: ${PG_HOST}
   port: 5432
-  user: report_user
-  password: ${PG_REPORT_PASS}
-  schema: reporting_db
+  user: ${PG_USER}
+  password: ${PG_PASS}
+  schema: ${PG_SCHEMA}
   extra:
     driver: psycopg2
     query:
@@ -13,29 +13,27 @@ pg_reporting:
       pool_size: 5
       pool_recycle: 1800
 
-mssql_dw:
+mssql:
   platform: MSSQL
-  host: sqlhost.example.com
+  host: ${MSSQL_HOST}
   port: 1433
-  user: svc_reader
+  user: ${MSSQL_USER}
   password: ${MSSQL_PASS}
-  schema: DataWarehouse
+  schema: ${MSSQL_SCHEMA}
   extra:
-    odbc_driver: "ODBC Driver 18 for SQL Server"
+    odbc_driver: "ODBC+Driver+17+for+SQL+Server"
     query:
       TrustServerCertificate: "yes"
     connect_args:
-      autocommit: true
+      autocommit: "true"
 
-td_analytics:
+td:
   platform: Teradata
   host: ${TD_HOST}
   user: ${TD_USER}
   password: ${TD_PASS}
-  schema: DWH
+  schema: ${TD_SCHEMA}
   extra:
     query:
-      LOGMECH: TD2
-    engine_options:
-      pool_size: 5
-      max_overflow: 5
+      logmech: LDAP
+      encryptdata: "true"
